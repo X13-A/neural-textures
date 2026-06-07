@@ -1,5 +1,7 @@
 # GPU deep-learning with CUDA for real-time neural texturing.
-The current goal is to use a neural network to predict the color of a texture, using only the UVs as input. For now, textures are trained on the CPU using [X13-A/neural-network-from-scratch](https://github.com/X13-A/neural-network-from-scratch), a C++ MLP training framework I previously built.
+Neural texturing using a small MLP on the GPU. Color is predicted using UVs as the input. 
+
+For now, textures are trained on the CPU using [X13-A/neural-network-from-scratch](https://github.com/X13-A/neural-network-from-scratch), a C++ MLP training framework I previously built.
 
 ## Features
 
