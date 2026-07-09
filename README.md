@@ -1,26 +1,29 @@
-# GPU Neural Texturing (C++ / CUDA)
-Neural texturing using a small MLP on the GPU. Color is predicted using UVs as the input. 
+# Real-time Neural Textures
+A framework allowing training of a neural network that learns to synthesize any image or texture in real-time. To put things simply, the model learns to map UV coordinates to RGB values.
 
-For now, textures are trained on the CPU using [X13-A/neural-network-from-scratch](https://github.com/X13-A/neural-network-from-scratch), a C++ MLP training framework I previously built.
+The project is more or less a CUDA / C++ implementation of the chapter "Real-Time Neural Network Implementation for GPUs" by Jakub Bokšanský in GPU Zen 4.
 
-## Features
+It is optimized for real-time inference and online training, allowing it to learn a decent representation of any image in only a few milliseconds.
 
-### Available now
-- Parameters loading
-- MLP inference
-- Draw to GLFW window
+## Results overview
 
-### Road map
-- Add support for training
-- Optimize inference
+<table>
+  <tr>
+    <td width="33.3%"><img src="media/titus_source.png" alt="Source image" width="100%"></td>
+    <td width="33.3%"><img src="media/titus_render.png" alt="Neural render" width="100%"></td>
+    <td width="33.3%"><img src="media/titus_flip.png" alt="FLIP error map" width="100%"></td>
+  </tr>
+  <tr>
+    <td align="center"><em>Source</em></td>
+    <td align="center"><em>Render</em></td>
+    <td align="center"><em>FLIP</em></td>
+  </tr>
+</table>
 
-## Results
+Read more about the project and the results on my [portfolio page](https://www.lix.polytechnique.fr/~foulon/#/projects/neural-textures)!
 
-<figure>
-  <img src="media/result.png" alt="Neural texturing result">
-  <figcaption style="text-align:center; text-">
-  
-  <em> Example of a poorly trained texture. Inference takes ~18ms on a mobile RTX 4050 (60W), at 512x512 resolution. </em>
-  
-  </figcaption>
-</figure>
+## Requirements
+
+- Windows
+- CUDA Toolkit 12.0 or newer
+- MSVC and the Windows SDK
