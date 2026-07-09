@@ -1,26 +1,36 @@
 #include <cstdlib>
+#include <exception>
 #include <iostream>
 
-#include "window.h"
-#include "screenspace_shader.h"
+#include "platform/window.h"
+#include "render/neural_renderer.h"
+#include "app/app.h"
+#include "app/ui.h"
 
-int main()
+int main(int argc, char** argv)
 {
-    constexpr int output_width = 512;
-    constexpr int output_height = 512;
+    if (argc > 1)
+    {
+        std::cerr << "Usage: " << argv[0] << "\n";
+        return EXIT_FAILURE;
+    }
+
+    constexpr int kWidth  = 1024;
+    constexpr int kHeight = 1024;
 
     try
     {
-        Window win(output_width, output_height, "Neural Texture");
-        screenspace_shader_init(output_width, output_height);
+        Window win(kWidth, kHeight, "Neural Texture");
+        renderer_init(kWidth, kHeight);
 
-        // Main loop
-        win.run([](unsigned char* ptr)
-        {
-            screenspace_shader_run(ptr);
-        });
+        AppState app;
+        app_init(app, kWidth, kHeight);
 
-        screenspace_shader_shutdown();
+        win.run(
+            [&](unsigned char* ptr) { app_update_frame(app, ptr); },
+            [&]()                    { ui_draw(app); });
+
+        renderer_shutdown();
     }
     catch (const std::exception& e)
     {
