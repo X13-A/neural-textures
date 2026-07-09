@@ -1,4 +1,4 @@
-# Real-time Neural Textures
+# Real-Time Neural Textures
 A framework allowing training of a neural network that learns to synthesize any image or texture in real-time. To put things simply, the model learns to map UV coordinates to RGB values.
 
 The project is more or less a CUDA / C++ implementation of the chapter "Real-Time Neural Network Implementation for GPUs" by Jakub Bokšanský in GPU Zen 4.
