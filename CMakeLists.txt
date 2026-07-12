@@ -71,5 +71,7 @@ target_compile_definitions(cuda_neural_texture PRIVATE ASSETS_DIR="${CMAKE_SOURC
 target_link_libraries(cuda_neural_texture PRIVATE d3d11 dxgi windowsapp comdlg32 shell32 ole32)
 target_compile_options(cuda_neural_texture PRIVATE $<$<COMPILE_LANGUAGE:CXX>:/await>)
 
+target_compile_options(cuda_neural_texture PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=/Zc:preprocessor>)
+
 # Target architecture
 set_property(TARGET cuda_neural_texture PROPERTY CUDA_ARCHITECTURES 89)
