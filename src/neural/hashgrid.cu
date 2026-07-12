@@ -41,7 +41,7 @@ __global__ void hg_init_kernel(float4* features, uint32_t total_float4s, uint32_
 
 __global__ void hg_optimize_kernel(
     float4*  features,
-    float4*  gradient,
+    int4*    gradient,
     float4*  adam_mean,
     float4*  adam_variance,
     uint32_t total_float4s,
@@ -53,7 +53,7 @@ __global__ void hg_optimize_kernel(
     uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx >= total_float4s) { return; }
 
-    float4 grad = gradient[idx];
+    float4 grad = unpack_float4(gradient[idx]);
     grad.x *= rcp_batch_size;
     grad.y *= rcp_batch_size;
     grad.z *= rcp_batch_size;
@@ -105,7 +105,7 @@ __global__ void hg_optimize_kernel(
     feat.w -= step.w;
     features[idx] = feat;
 
-    gradient[idx] = {0.0f, 0.0f, 0.0f, 0.0f};
+    gradient[idx] = {0, 0, 0, 0};
 }
 
 void hg_allocate(const HashGrid_Configuration& config, HashGrid_Buffers* buffers)

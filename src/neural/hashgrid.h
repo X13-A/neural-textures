@@ -24,7 +24,7 @@ struct HashGrid_Configuration
 struct HashGrid_Buffers
 {
     float4* d_features      = nullptr;
-    float4* d_gradient      = nullptr;
+    int4*   d_gradient      = nullptr;  // Packed fixed-point
     float4* d_adam_mean     = nullptr;
     float4* d_adam_variance = nullptr;
 };

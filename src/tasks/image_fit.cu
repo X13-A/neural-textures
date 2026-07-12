@@ -105,7 +105,7 @@ __global__ void image_fit_train_kernel(
     int image_width,
     int image_height,
     const float4* d_parameters,
-    float4*       gradient_buffer,
+    int4*         gradient_buffer,
     MLP_Configuration config,
     uint32_t      iteration,
     uint32_t      rng_seed,
@@ -113,7 +113,7 @@ __global__ void image_fit_train_kernel(
     bool          use_hashgrid,
     HashGrid_Configuration hg_config,
     const float4* hg_features,
-    float4*       hg_gradient)
+    int4*         hg_gradient)
 {
     // Draw random UV and load target color
     uint32_t thread_id = blockIdx.x * blockDim.x + threadIdx.x;

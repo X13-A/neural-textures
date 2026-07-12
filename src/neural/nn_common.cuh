@@ -25,17 +25,36 @@ __device__ inline float rand_float(uint32_t& state)
     return (float)(lcg_step(state) >> 8) * (1.0f / 16777216.0f);
 }
 
-// Gradient accumulation
+// Gradient accumulation in fixed-point:
+// floats are scaled by FLOAT_PACKING_CONSTANT and truncated to int
+static constexpr float FLOAT_PACKING_CONSTANT = 65536.0f;
 
-__device__ inline void accumulate_gradient(float4* gradient_buffer, uint32_t idx, float4 gradient)
+__device__ inline int4 pack_float4(float4 x)
 {
-    // Warp-aggregated float atomicAdd
+    return {(int)(x.x * FLOAT_PACKING_CONSTANT),
+            (int)(x.y * FLOAT_PACKING_CONSTANT),
+            (int)(x.z * FLOAT_PACKING_CONSTANT),
+            (int)(x.w * FLOAT_PACKING_CONSTANT)};
+}
+
+__device__ inline float4 unpack_float4(int4 x)
+{
+    return {x.x / FLOAT_PACKING_CONSTANT,
+            x.y / FLOAT_PACKING_CONSTANT,
+            x.z / FLOAT_PACKING_CONSTANT,
+            x.w / FLOAT_PACKING_CONSTANT};
+}
+
+__device__ inline void accumulate_gradient(int4* gradient_buffer, uint32_t idx, float4 gradient)
+{
+    int4 packed = pack_float4(gradient);
+
     auto group = cg::labeled_partition(cg::coalesced_threads(), idx);
 
-    float x = cg::reduce(group, gradient.x, cg::plus<float>());
-    float y = cg::reduce(group, gradient.y, cg::plus<float>());
-    float z = cg::reduce(group, gradient.z, cg::plus<float>());
-    float w = cg::reduce(group, gradient.w, cg::plus<float>());
+    int x = cg::reduce(group, packed.x, cg::plus<int>());
+    int y = cg::reduce(group, packed.y, cg::plus<int>());
+    int z = cg::reduce(group, packed.z, cg::plus<int>());
+    int w = cg::reduce(group, packed.w, cg::plus<int>());
 
     if (group.thread_rank() == 0)
     {
