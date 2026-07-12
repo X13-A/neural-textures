@@ -41,7 +41,7 @@ __global__ void hg_init_kernel(float4* features, uint32_t total_float4s, uint32_
 
 __global__ void hg_optimize_kernel(
     float4*  features,
-    int4*    gradient,
+    float4*  gradient,
     float4*  adam_mean,
     float4*  adam_variance,
     uint32_t total_float4s,
@@ -53,7 +53,7 @@ __global__ void hg_optimize_kernel(
     uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx >= total_float4s) { return; }
 
-    float4 grad = unpack_float4(gradient[idx]);
+    float4 grad = gradient[idx];
     grad.x *= rcp_batch_size;
     grad.y *= rcp_batch_size;
     grad.z *= rcp_batch_size;
@@ -105,22 +105,21 @@ __global__ void hg_optimize_kernel(
     feat.w -= step.w;
     features[idx] = feat;
 
-    gradient[idx] = {0, 0, 0, 0};
+    gradient[idx] = {0.0f, 0.0f, 0.0f, 0.0f};
 }
 
 void hg_allocate(const HashGrid_Configuration& config, HashGrid_Buffers* buffers)
 {
-    size_t bytes_f4 = config.total_float4s * sizeof(float4);
-    size_t bytes_i4 = config.total_float4s * sizeof(int4);
+    size_t bytes = config.total_float4s * sizeof(float4);
 
-    CUDA_CHECK(cudaMalloc(&buffers->d_features,      bytes_f4));
-    CUDA_CHECK(cudaMalloc(&buffers->d_gradient,      bytes_i4));
-    CUDA_CHECK(cudaMalloc(&buffers->d_adam_mean,     bytes_f4));
-    CUDA_CHECK(cudaMalloc(&buffers->d_adam_variance, bytes_f4));
+    CUDA_CHECK(cudaMalloc(&buffers->d_features,      bytes));
+    CUDA_CHECK(cudaMalloc(&buffers->d_gradient,      bytes));
+    CUDA_CHECK(cudaMalloc(&buffers->d_adam_mean,     bytes));
+    CUDA_CHECK(cudaMalloc(&buffers->d_adam_variance, bytes));
 
-    CUDA_CHECK(cudaMemset(buffers->d_gradient,      0, bytes_i4));
-    CUDA_CHECK(cudaMemset(buffers->d_adam_mean,     0, bytes_f4));
-    CUDA_CHECK(cudaMemset(buffers->d_adam_variance, 0, bytes_f4));
+    CUDA_CHECK(cudaMemset(buffers->d_gradient,      0, bytes));
+    CUDA_CHECK(cudaMemset(buffers->d_adam_mean,     0, bytes));
+    CUDA_CHECK(cudaMemset(buffers->d_adam_variance, 0, bytes));
 }
 
 void hg_init_features(const HashGrid_Configuration& config, HashGrid_Buffers* buffers, uint32_t seed)
@@ -152,11 +151,10 @@ void hg_optimize(const HashGrid_Configuration& config, HashGrid_Buffers* buffers
 void hg_reset_training(const HashGrid_Configuration& config, HashGrid_Buffers* buffers, uint32_t seed)
 {
     hg_init_features(config, buffers, seed);
-    size_t bytes_i4 = config.total_float4s * sizeof(int4);
-    size_t bytes_f4 = config.total_float4s * sizeof(float4);
-    CUDA_CHECK(cudaMemset(buffers->d_gradient, 0, bytes_i4));
-    CUDA_CHECK(cudaMemset(buffers->d_adam_mean, 0, bytes_f4));
-    CUDA_CHECK(cudaMemset(buffers->d_adam_variance, 0, bytes_f4));
+    size_t bytes = config.total_float4s * sizeof(float4);
+    CUDA_CHECK(cudaMemset(buffers->d_gradient, 0, bytes));
+    CUDA_CHECK(cudaMemset(buffers->d_adam_mean, 0, bytes));
+    CUDA_CHECK(cudaMemset(buffers->d_adam_variance, 0, bytes));
 }
 
 void hg_clear_adam(const HashGrid_Configuration& config, HashGrid_Buffers* buffers)

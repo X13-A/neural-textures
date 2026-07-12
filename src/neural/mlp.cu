@@ -81,7 +81,7 @@ __global__ void mlp_init_he_kernel(void* d_parameters_void, uint32_t total_param
 
 __global__ void mlp_optimize_kernel(
     void*    d_parameters_void,
-    int4*    gradient_buffer,
+    float4*  gradient_buffer,
     float4*  d_adam_mean,
     float4*  d_adam_variance,
     uint32_t parameter_count,
@@ -93,7 +93,7 @@ __global__ void mlp_optimize_kernel(
     uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx >= parameter_count) return;
 
-    float4 grad = unpack_float4(gradient_buffer[idx]);
+    float4 grad = gradient_buffer[idx];
     grad.x *= rcp_batch_size;
     grad.y *= rcp_batch_size;
     grad.z *= rcp_batch_size;
@@ -146,7 +146,7 @@ __global__ void mlp_optimize_kernel(
     param.w -= step.w;
     d_parameters[idx] = param;
 
-    gradient_buffer[idx] = {0, 0, 0, 0};
+    gradient_buffer[idx] = {0.0f, 0.0f, 0.0f, 0.0f};
 }
 
 // ============================================================================
@@ -157,8 +157,8 @@ void mlp_allocate_training_buffers(MLP_Buffers* buffers)
 {
     size_t count = buffers->d_parameters_size / sizeof(float4);
 
-    CUDA_CHECK(cudaMalloc(&buffers->d_gradient_buffer, count * sizeof(int4)));
-    CUDA_CHECK(cudaMemset(buffers->d_gradient_buffer, 0, count * sizeof(int4)));
+    CUDA_CHECK(cudaMalloc(&buffers->d_gradient_buffer, count * sizeof(float4)));
+    CUDA_CHECK(cudaMemset(buffers->d_gradient_buffer, 0, count * sizeof(float4)));
 
     CUDA_CHECK(cudaMalloc(&buffers->d_adam_mean,     count * sizeof(float4)));
     CUDA_CHECK(cudaMemset(buffers->d_adam_mean,     0, count * sizeof(float4)));
@@ -183,7 +183,7 @@ void mlp_reset_training(const MLP_Configuration& config, MLP_Buffers* buffers, u
 
     size_t count = buffers->d_parameters_size / sizeof(float4);
 
-    CUDA_CHECK(cudaMemset(buffers->d_gradient_buffer, 0, count * sizeof(int4)));
+    CUDA_CHECK(cudaMemset(buffers->d_gradient_buffer, 0, count * sizeof(float4)));
     CUDA_CHECK(cudaMemset(buffers->d_adam_mean, 0, count * sizeof(float4)));
     CUDA_CHECK(cudaMemset(buffers->d_adam_variance, 0, count * sizeof(float4)));
 }

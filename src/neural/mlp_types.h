@@ -25,7 +25,7 @@ struct MLP_Buffers
 {
     float4* d_parameters      = nullptr;
     size_t  d_parameters_size = 0;
-    int4*   d_gradient_buffer = nullptr;
+    float4* d_gradient_buffer = nullptr;
     float4* d_adam_mean       = nullptr;
     float4* d_adam_variance   = nullptr;
 };

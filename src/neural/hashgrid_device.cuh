@@ -80,7 +80,7 @@ __device__ inline void hg_encode(
 // Distributes input_delta back to the 4 nearest grid cells weighted by bilinear coefficients
 __device__ inline void hg_accumulate_gradient(
     const HashGrid_Configuration& config,
-    int4* hg_gradient,
+    float4* hg_gradient,
     float2 input,
     const float4* input_delta,
     uint32_t level)

@@ -137,7 +137,7 @@ __device__ inline void backprop_training(
     const float4*            output_grad,
     const float4*            activations,
     const float4*            d_parameters,
-    int4*                    gradient_buffer,
+    float4*                  gradient_buffer,
     const MLP_Configuration* config)
 {
     int last = config->num_layers - 2;
