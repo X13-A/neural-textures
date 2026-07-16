@@ -106,12 +106,12 @@ __global__ void image_fit_train_kernel(
     int image_height,
     const float4* d_parameters,
     int4*         gradient_buffer,
-    MLP_Configuration config,
+    const __grid_constant__ MLP_Configuration config,
     uint32_t      iteration,
     uint32_t      rng_seed,
     float*        d_loss_output,
     bool          use_hashgrid,
-    HashGrid_Configuration hg_config,
+    const __grid_constant__ HashGrid_Configuration hg_config,
     const float4* hg_features,
     int4*         hg_gradient)
 {
