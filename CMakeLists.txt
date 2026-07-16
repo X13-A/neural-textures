@@ -66,6 +66,9 @@ target_link_libraries(cuda_neural_texture PRIVATE imgui_lib)
 target_include_directories(cuda_neural_texture PRIVATE ${CMAKE_SOURCE_DIR}/src)
 target_include_directories(cuda_neural_texture PRIVATE ${stb_SOURCE_DIR})
 
+# Neural network size limits, to keep MLP_Configuration as small as possible
+target_compile_definitions(cuda_neural_texture PRIVATE MAX_LAYER_QUARTETS=8 MAX_LAYERS=4)
+
 # Absolute path to assets
 target_compile_definitions(cuda_neural_texture PRIVATE ASSETS_DIR="${CMAKE_SOURCE_DIR}/assets")
 target_link_libraries(cuda_neural_texture PRIVATE d3d11 dxgi windowsapp comdlg32 shell32 ole32)

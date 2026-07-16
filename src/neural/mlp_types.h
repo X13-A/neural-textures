@@ -2,10 +2,16 @@
 #include <cuda_runtime.h>
 #include <cstdint>
 
-// TODO: Should be defined by the user in the application layer
+// Should be defined by the user in the application layer
 // Fit this to your neural network size
-#define MAX_LAYER_QUARTETS 8
-#define MAX_LAYERS 4
+#ifndef MAX_LAYER_QUARTETS
+    #define MAX_LAYER_QUARTETS 16
+#endif
+
+#ifndef MAX_LAYERS
+    #define MAX_LAYERS 8
+#endif
+
 #define ACTIVATION_QUARTETS_PER_NETWORK (MAX_LAYER_QUARTETS * MAX_LAYERS)
 
 enum class ActivationFunction
